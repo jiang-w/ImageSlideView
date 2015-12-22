@@ -7,6 +7,8 @@
 //
 
 #import "ViewController.h"
+#import "ImageSlideView.h"
+#import <Masonry.h>
 
 @interface ViewController ()
 
@@ -16,7 +18,16 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
+    
+    NSMutableArray<UIImage *> *images = [NSMutableArray array];
+    
+    ImageSlideView *imgSlide = [[ImageSlideView alloc] init];
+    imgSlide.images = images;
+    [self.view addSubview:imgSlide];
+    [imgSlide mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.center.equalTo(self.view);
+        make.size.equalTo(self.view).sizeOffset(CGSizeMake(-20, -500));
+    }];
 }
 
 - (void)didReceiveMemoryWarning {

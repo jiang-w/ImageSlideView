@@ -12,6 +12,7 @@
 @interface ImageSlideView()
 
 @property(nonatomic, strong) UIScrollView *imageScroll;
+@property(nonatomic, strong) UIView *container;
 @property(nonatomic, strong) NSMutableArray<UIImageView *> *imageViews;
 
 @end
@@ -21,17 +22,92 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        _imageScroll = [[UIScrollView alloc] init];
-        _imageScroll.delegate = self;
-        [self addSubview:_imageScroll];
-        [_imageScroll mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.edges.equalTo(self);
-        }];
-        
         _imageWidth = frame.size.width;
-        _imageViews = [NSMutableArray array];
+        [self initView];
     }
     return self;
+}
+
+- (void)initView {
+    [self addSubview:self.imageScroll];
+    [self.imageScroll mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.edges.equalTo(self);
+    }];
+    
+    [self.imageScroll addSubview:self.container];
+    [self.container mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.edges.equalTo(self.imageScroll);
+        make.height.equalTo(self.imageScroll);
+    }];
+    
+    UIView *frame = [UIView new];
+    [self.imageScroll addSubview:frame];
+    frame.layer.borderColor = [UIColor redColor].CGColor;
+    frame.layer.borderWidth = 2.0f;
+    [frame mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.edges.equalTo(self.imageScroll);
+    }];
+
+}
+
+- (void)setImageViewAndLayout {
+    for (int i = 0; i < self.imageViews.count; i++) {
+        UIImageView *imgView = self.imageViews[i];
+        [self.container addSubview:imgView];
+        [imgView mas_makeConstraints:^(MASConstraintMaker *make) {
+            if (i == 0) {
+                make.left.top.bottom.equalTo(self.container);
+            }
+            else {
+                UIImageView *pervImgView = self.imageViews[i - 1];
+                make.left.equalTo(pervImgView.mas_right);
+                make.top.bottom.equalTo(self.container);
+            }
+            
+            make.width.mas_equalTo(self.imageWidth);
+            
+            if (i == self.imageViews.count - 1) {
+                make.right.equalTo(self.container);
+            }
+        }];
+    }
+}
+
+- (void)clearAllImages {
+    for (UIImageView *view in self.imageViews) {
+        [view removeFromSuperview];
+    }
+    [self.imageViews removeAllObjects];
+}
+
+
+#pragma mark - property
+
+- (UIScrollView *)imageScroll {
+    if (!_imageScroll) {
+        _imageScroll = [[UIScrollView alloc] init];
+        _imageScroll.delegate = self;
+        
+        _imageScroll.backgroundColor = [UIColor lightGrayColor];
+        _imageScroll.clipsToBounds = NO;
+        _imageScroll.bounces = NO;
+    }
+    return _imageScroll;
+}
+
+- (UIView *)container {
+    if (!_container) {
+        _container = [[UIView alloc] init];
+        _container.backgroundColor = [UIColor blueColor];
+    }
+    return _container;
+}
+
+- (NSMutableArray *)imageViews {
+    if (!_imageViews) {
+        _imageViews = [NSMutableArray array];
+    }
+    return _imageViews;
 }
 
 - (void)setImages:(NSArray<UIImage *> *)images {
@@ -39,26 +115,13 @@
         _images = images;
         [self clearAllImages];
         
-        if (_images.count > 0) {
-            CGFloat imageWidth = self.imageWidth;
-            CGFloat imageHeight = self.imageScroll.frame.size.height;
-            self.imageScroll.contentSize = CGSizeMake(imageWidth * _images.count, imageHeight);
-
-            for (int i = 0; i < _images.count; i++) {
-                UIImageView *imageView = [[UIImageView alloc] initWithImage:_images[i]];
-                imageView.frame = CGRectMake(imageWidth * i, 0, imageWidth, imageHeight);
-                [self.imageScroll addSubview:imageView];
-            }
+        for (UIImage *img in _images) {
+            UIImageView *imageView = [[UIImageView alloc] initWithImage:img];
+            [self.imageViews addObject:imageView];
         }
+        
+        [self setImageViewAndLayout];
     }
-}
-
-
-- (void)clearAllImages {
-    for (UIView *imageView in self.imageScroll.subviews) {
-        [imageView removeFromSuperview];
-    }
-    self.imageScroll.contentSize = self.imageScroll.frame.size;
 }
 
 @end
