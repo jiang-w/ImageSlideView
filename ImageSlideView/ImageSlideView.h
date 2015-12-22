@@ -11,6 +11,5 @@
 @interface ImageSlideView : UIView <UIScrollViewDelegate>
 
 @property(nonatomic, strong) NSArray<UIImage *> *images;
-@property(nonatomic, assign) CGFloat imageWidth;
 
 @end

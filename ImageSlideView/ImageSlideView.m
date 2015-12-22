@@ -22,7 +22,6 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        _imageWidth = frame.size.width;
         [self initView];
     }
     return self;
@@ -40,14 +39,13 @@
         make.height.equalTo(self.imageScroll);
     }];
     
-    UIView *frame = [UIView new];
-    [self.imageScroll addSubview:frame];
-    frame.layer.borderColor = [UIColor redColor].CGColor;
-    frame.layer.borderWidth = 2.0f;
-    [frame mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.edges.equalTo(self.imageScroll);
-    }];
-
+//    UIView *frame = [UIView new];
+//    [self.imageScroll addSubview:frame];
+//    frame.layer.borderColor = [UIColor redColor].CGColor;
+//    frame.layer.borderWidth = 2.0f;
+//    [frame mas_makeConstraints:^(MASConstraintMaker *make) {
+//        make.edges.equalTo(self.imageScroll);
+//    }];
 }
 
 - (void)setImageViewAndLayout {
@@ -55,6 +53,8 @@
         UIImageView *imgView = self.imageViews[i];
         [self.container addSubview:imgView];
         [imgView mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.width.equalTo(self.imageScroll);
+            
             if (i == 0) {
                 make.left.top.bottom.equalTo(self.container);
             }
@@ -63,9 +63,7 @@
                 make.left.equalTo(pervImgView.mas_right);
                 make.top.bottom.equalTo(self.container);
             }
-            
-            make.width.mas_equalTo(self.imageWidth);
-            
+
             if (i == self.imageViews.count - 1) {
                 make.right.equalTo(self.container);
             }
@@ -86,11 +84,14 @@
 - (UIScrollView *)imageScroll {
     if (!_imageScroll) {
         _imageScroll = [[UIScrollView alloc] init];
+        _imageScroll.showsHorizontalScrollIndicator = NO;
+        _imageScroll.showsVerticalScrollIndicator = NO;
+        _imageScroll.pagingEnabled = YES;
+        _imageScroll.bounces = NO;
         _imageScroll.delegate = self;
         
-        _imageScroll.backgroundColor = [UIColor lightGrayColor];
-        _imageScroll.clipsToBounds = NO;
-        _imageScroll.bounces = NO;
+//        _imageScroll.backgroundColor = [UIColor lightGrayColor];
+//        _imageScroll.clipsToBounds = NO;
     }
     return _imageScroll;
 }
@@ -98,7 +99,9 @@
 - (UIView *)container {
     if (!_container) {
         _container = [[UIView alloc] init];
-        _container.backgroundColor = [UIColor blueColor];
+        
+//        _container.backgroundColor = [UIColor blueColor];
+//        _container.alpha = 0.5;
     }
     return _container;
 }
