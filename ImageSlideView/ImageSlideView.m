@@ -27,6 +27,18 @@
     return self;
 }
 
+- (void)layoutSubviews {
+    if (!CGSizeEqualToSize(self.imageScroll.contentSize, CGSizeZero)) {
+        if (self.images.count > 1) {
+            UIImageView *firstImage = self.imageViews[1];
+            self.imageScroll.contentOffset = firstImage.frame.origin;
+        }
+    }
+}
+
+
+#pragma mark - private
+
 - (void)initView {
     [self addSubview:self.imageScroll];
     [self.imageScroll mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -122,8 +134,32 @@
             UIImageView *imageView = [[UIImageView alloc] initWithImage:img];
             [self.imageViews addObject:imageView];
         }
+        if (_images.count > 1) {
+            UIImageView *leading = [[UIImageView alloc] initWithImage:[_images lastObject]];
+            [self.imageViews insertObject:leading atIndex:0];
+            UIImageView *trailing = [[UIImageView alloc] initWithImage:[_images firstObject]];
+            [self.imageViews addObject:trailing];
+        }
         
         [self setImageViewAndLayout];
+    }
+}
+
+
+#pragma mark - UIScrollViewDelegate
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
+    if (self.images.count > 1) {
+        CGPoint currentOffset = self.imageScroll.contentOffset;
+        CGPoint firstImageOffset = self.imageViews[1].frame.origin;
+        CGPoint lastImageOffset = self.imageViews[self.images.count].frame.origin;
+        
+        if (CGPointEqualToPoint(currentOffset, [self.imageViews firstObject].frame.origin)) {
+            self.imageScroll.contentOffset = lastImageOffset;
+        }
+        if (CGPointEqualToPoint(currentOffset, [self.imageViews lastObject].frame.origin)) {
+            self.imageScroll.contentOffset = firstImageOffset;
+        }
     }
 }
 

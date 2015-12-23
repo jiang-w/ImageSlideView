@@ -28,12 +28,12 @@
     [images addObject:img3];
     
     ImageSlideView *imgSlide = [[ImageSlideView alloc] init];
-    imgSlide.images = images;
     [self.view addSubview:imgSlide];
     [imgSlide mas_makeConstraints:^(MASConstraintMaker *make) {
         make.center.equalTo(self.view);
         make.size.equalTo(self.view).sizeOffset(CGSizeMake(0, -500));
     }];
+    imgSlide.images = images;
 }
 
 - (void)didReceiveMemoryWarning {
