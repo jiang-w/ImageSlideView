@@ -23,6 +23,8 @@
     self = [super initWithFrame:frame];
     if (self) {
         [self initView];
+        
+        [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(revolvingScroll) userInfo:nil repeats:YES];
     }
     return self;
 }
@@ -88,6 +90,16 @@
         [view removeFromSuperview];
     }
     [self.imageViews removeAllObjects];
+}
+
+- (void)revolvingScroll {
+    CGFloat pageWidth = CGRectGetWidth(self.imageScroll.frame);
+    CGPoint offset = self.imageScroll.contentOffset;
+    [self.imageScroll setContentOffset:CGPointMake(offset.x + pageWidth, 0) animated:YES];
+    
+    if (offset.x == pageWidth * (self.imageViews.count - 1)) {
+        self.imageScroll.contentOffset = CGPointMake(pageWidth, 0);
+    }
 }
 
 
